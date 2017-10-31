@@ -1,0 +1,16 @@
+{
+	"name": "nine-mens-morris",
+	"version": "0.0.1",
+	"description": "Nine men's Morris implementation in Node.js",
+	"keywords": [
+		"mill",
+		"game"
+	],
+	"license": "ISC",
+	"author": "Maurice Conrad",
+	"main": "main.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {}
+}
