@@ -162,7 +162,7 @@ function handleUserMovement(point) {
 
   render();
 
-  if (changeset && changeset.success && teams[game.nextTeam]) {
+  if (changeset && changeset.success && teams[game.nextTeam] && game.nextAction != "remove") {
     // AI is doing next movement
     let bestMoves = ai.calcMoves(game);
     actions[bestMoves[0].action](bestMoves[0]);

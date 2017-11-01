@@ -7,6 +7,14 @@ The board is completely modular which means that you are not focused on the norm
 By using the property `points` in board options, you can define how many points exist on each side and wether they are connected with the upper row.
 And the amount or rows can be defined with the property `rows` in board options. More about the idea behind `points` in [Points](#Points).
 
+To require the module you can browserify it simply with *browserify*. In the case of a browser's API the module will add the class `MorrisGame` to the window object you can use instead.
+
+As Node.js module, just require it:
+
+```javascript
+const MorrisGame = require('morrisgame');
+```
+
 To create a new game instance call:
 ```javascript
 var myGame = new Morris({
@@ -251,3 +259,27 @@ yourBoard.mills = [
   ...
 ];
 ```
+
+
+## AI
+
+The AI used here is a fast and simple AI program that tries to get the best moves by validating their potential. It is important to know, that the AI **is not** perfect by calculating the whole game. That would have been a solution but I did not liked such a AI. I wanted an AI that is not absolutely perfect but just simple and fast.
+
+In detail, the AI works with a lot of methods that return a potential for inner game actions and moves. They are not too complex but very general. You can win against the AI ;-)
+
+The AI module can also be used within browser's API or within Node.js. *You do not have to browserify the module!* Within a browser's API it will create the class `MorrisAI` to the window object you can use instead. If you are using Node.js, you can *require* it simply.
+
+```javascript
+const MorrisAI = require('./morrisAI');
+```
+
+```javascript
+var ai = new MorrisAI(myGame, MorrisGame);
+
+// Get the best moves
+var bestMoves = ai.calcMoves();
+
+// Log them to console
+console.log(bestMoves);
+```
+You need to put your game instance into and your constructor class. That is important because the AI would do some stuff with the original class.

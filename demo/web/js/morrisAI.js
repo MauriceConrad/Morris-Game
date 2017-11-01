@@ -14,27 +14,27 @@
 
 
       for (var move of possibleMoves) {
-        let millPotencial = self.millPotencial(move) * 1.9;
-        //console.log(millPotencial);
-        let preventMillPotencial = self.preventMillPotencial(move) * 1.8;
-        //console.log(preventMillPotencial, move.targetPoint);
-        let prepareMillPotencial = self.prepareMillPotencial(move) * 1.7;
-        //console.log(prepareMillPotencial);
+        let millPotential = self.millPotential(move) * 1.9;
+        //console.log(millPotential);
+        let preventMillPotential = self.preventMillPotential(move) * 1.8;
+        //console.log(preventMillPotential, move.targetPoint);
+        let prepareMillPotential = self.prepareMillPotential(move) * 1.7;
+        //console.log(prepareMillPotential);
 
-        let tacticsPotencial = self.tacticsPotencial(move) * 1;
+        let tacticsPotential = self.tacticsPotential(move) * 1;
 
 
-        move.potencial = millPotencial + preventMillPotencial + prepareMillPotencial + tacticsPotencial;
+        move.potential = millPotential + preventMillPotential + prepareMillPotential + tacticsPotential;
       }
 
       var moves = possibleMoves.sort(function(a, b) {
-        return a.potencial < b.potencial ? 1 : a.potencial > b.potencial ? -1 : 0;
+        return a.potential < b.potential ? 1 : a.potential > b.potential ? -1 : 0;
       })
 
 
       return moves;
     }
-    millPotencial(move) {
+    millPotential(move) {
       var self = this;
 
 
@@ -60,30 +60,30 @@
       return changeset.targetPoint.mills.length;
 
     }
-    preventMillPotencial(move) {
+    preventMillPotential(move) {
       var self = this;
 
       var changeset;
       var game = MorrisAI.cloneGame(this.game, this.gameConstructor);
       var contraryTeams = game.teams.filter(team => team.name != game.nextTeam);
       var targetPoint = game.board.getPoint(move.targetPoint.position.row, move.targetPoint.position.position);
-      var potencial = 0;
+      var potential = 0;
 
       var actions = {
         set() {
           contraryTeams.forEach(function(team) {
-            potencial += checkForMill(team);
+            potential += checkForMill(team);
             game = MorrisAI.cloneGame(self.game, self.gameConstructor);
           });
         },
         move() {
           contraryTeams.forEach(function(team) {
-            potencial += checkForMill(team);
+            potential += checkForMill(team);
             game = MorrisAI.cloneGame(self.game, self.gameConstructor);
           });
         },
         remove() {
-          potencial += targetPoint.mills.length;
+          potential += targetPoint.mills.length;
         }
       };
       function checkForMill(team) {
@@ -96,10 +96,10 @@
 
       actions[game.nextAction]();
 
-      return potencial;
+      return potential;
 
     }
-    prepareMillPotencial(move) {
+    prepareMillPotential(move) {
       var self = this;
       var game = MorrisAI.cloneGame(this.game, this.gameConstructor);
 
@@ -107,7 +107,7 @@
       var contraryTeams = game.teams.filter(team => team.name != game.nextTeam);
 
 
-      var potencial = 0;
+      var potential = 0;
 
       var actions = {
         set: checkForPreparedMill,
@@ -118,7 +118,7 @@
               team: team.name
             }, move.targetPoint.position);
             game.board.set(setOptions);
-            potencial += targetPoint.mills.length;
+            potential += targetPoint.mills.length;
           });
         }
       };
@@ -132,7 +132,7 @@
                 team: game.nextTeam
               }, point.position);
               game.board.set(setOptions);
-              potencial += point.mills.length;
+              potential += point.mills.length;
 
               setOptions.team = false;
               game.board.set(setOptions);
@@ -141,23 +141,24 @@
         }
       }
 
-      return potencial;
+      return potential;
 
     }
-    tacticsPotencial(move) {
-      var potencial = 0;
+    tacticsPotential(move) {
+      var potential = 0;
 
       for (var direction in move.targetPoint.surroundings) {
         if (move.targetPoint.surroundings.hasOwnProperty(direction)) {
           let point = move.targetPoint.surroundings[direction];
           if (point) {
-            potencial += point.team === game.nextTeam ? 1 : 0.5;
+            potential += point.team === game.nextTeam ? 1 : 0.5;
           }
         }
       }
 
-      return potencial;
+      return potential;
     }
+    // Static method to clone a game instance
     static cloneGame(gameInstance, gameConstructor) {
       var options = {
         board: {

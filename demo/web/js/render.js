@@ -21,6 +21,16 @@ function renderGame(game, svg, options, clickHandle) {
     svg.removeChild(svg.childNodes[0]);
   }
 
+  var defs = `
+  <defs>
+    <filter id="f1" x="0" y="0">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
+    </filter>
+  </defs>`;
+  svg.innerHTML = defs;
+
+  var boardGroup = createElementNS("g");
+
   var rowSize = (viewBox.height - offset * 2) / (game.board.rows.length * 2);
 
   var center = {
@@ -56,7 +66,7 @@ function renderGame(game, svg, options, clickHandle) {
       var lastRowOffset = game.board.rows.length * rowSize;
       var firstPointCoords = getPointPos(line[0], firstRowOffset, firstRowOffset * 2);
       var lastPointCoords = getPointPos(line[line.length - 1], lastRowOffset, lastRowOffset * 2);
-      svg.appendChild(createElementNS("line", {
+      boardGroup.appendChild(createElementNS("line", {
         x1: firstPointCoords.x,
         y1: firstPointCoords.y,
         x2: lastPointCoords.x,
@@ -79,7 +89,7 @@ function renderGame(game, svg, options, clickHandle) {
       height: rowBoundings,
       //style: 'stroke-width: ' + options.strokeWidth + 'px;'
     });
-    svg.appendChild(rect);
+    boardGroup.appendChild(rect);
 
     row.forEach(function(point, pointIndex) {
       var pointCoords = getPointPos(point, rowOffset, rowBoundings);
@@ -94,7 +104,7 @@ function renderGame(game, svg, options, clickHandle) {
       circle.addEventListener("click", function() {
         clickHandle(point);
       });
-      svg.appendChild(circle);
+      boardGroup.appendChild(circle);
 
       var piece = createElementNS("circle", {
         r: options.radius * 0.75,
@@ -106,7 +116,7 @@ function renderGame(game, svg, options, clickHandle) {
       piece.addEventListener("click", function() {
         clickHandle(point);
       });
-      svg.appendChild(piece);
+      boardGroup.appendChild(piece);
 
     });
 
@@ -174,7 +184,7 @@ function renderGame(game, svg, options, clickHandle) {
         y: teamPiecePos[team.name].y + (pieceOffset * line + pieceOffset) * teamPiecePos[team.name].dirY
       };
 
-      svg.appendChild(createElementNS("circle", {
+      boardGroup.appendChild(createElementNS("circle", {
         r: pieceRadius,
         cx: pos.x,
         cy: pos.y,
@@ -184,10 +194,22 @@ function renderGame(game, svg, options, clickHandle) {
 
 
   });
+
+  svg.appendChild(boardGroup);
+
+  if (game.gameOver) {
+    boardGroup.setAttributeNS(null, "filter", "url(#f1)");
+    svg.appendChild(createElementNS("text", {
+      x: viewBox.width / 2,
+      y: viewBox.height / 2,
+      "text-anchor": "middle",
+      "alignment-baseline": "middle",
+    }, [document.createTextNode("Game Over")]));
+  }
 }
 
 
-function createElementNS(tagName, attributes = {}) {
+function createElementNS(tagName, attributes = {}, childNodes = []) {
   const xmlns = "http://www.w3.org/2000/svg";
 
   var element = document.createElementNS(xmlns, tagName);
@@ -195,6 +217,11 @@ function createElementNS(tagName, attributes = {}) {
     if (attributes.hasOwnProperty(attribute)) {
       element.setAttributeNS(null, attribute, attributes[attribute]);
     }
+  }
+
+  for (var child of childNodes) {
+
+    element.appendChild(child);
   }
 
   return element;

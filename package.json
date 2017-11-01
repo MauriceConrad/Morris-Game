@@ -1,6 +1,6 @@
 {
-	"name": "nine-mens-morris",
-	"version": "0.0.1",
+	"name": "morrisgame",
+	"version": "0.1.0",
 	"description": "Nine men's Morris implementation in Node.js",
 	"keywords": [
 		"mill",
