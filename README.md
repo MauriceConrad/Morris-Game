@@ -144,6 +144,153 @@ This will return an `array` containing objects representing each movement specia
 }
 ```
 
+### Get Piece
+
+To get a piece that is related to a point's position, use the `getPiece` method.
+
+```javascript
+// Returns the piece object literal
+var piece = myGame.getPiece({
+  row: 0,
+  position: 0
+});
+// Log the piece object
+console.log(piece);
+```
+
+#### Important
+
+If not piece is related to this point, the method will return `undefined`.
+
+### Set
+
+To set a new piece to the board use the `set` method of your game instance.
+(More about the coordinating system in [MorrisBoard->Coordinating](#Coordinating))
+
+```javascript
+var changeset = myGame.set({
+  team: "white", // Name of the team you want to use
+  row: 0,
+  position: 0
+});
+// If an error occured (Set action was not allowed)
+if (changeset.error) {
+  console.error(err);
+}
+// The set action was successfully
+else {
+  console.log(changeset);
+}
+```
+
+### Move
+
+To move a piece from one point to another one, use the `move` method of your game instance.
+
+```javascript
+var changeset = myGame.move({
+  row: 0,
+  position: 0,
+}, {
+  row: 0,
+  position: 1,
+});
+
+// If an error occured (Movement was not allowed)
+if (changeset.error) {
+  console.error(err);
+}
+// The movement was successfully
+else {
+  console.log(changeset);
+}
+```
+
+### Remove
+
+To remove a piece from the board, use the `remove` method of your game instance.
+
+```javascript
+var changeset = myGame.remove({
+  row: 0,
+  position: 0
+});
+// If an error occured (Removement was not allowed)
+if (changeset.error) {
+  console.error(err);
+}
+// The removement was successfully
+else {
+  console.log(changeset);
+}
+```
+
+### Next Team
+
+To get the next team just get the property `nextTeam` of your game instance.
+*Please keep in mind that this property is a getter and is related to the* `__lastChangeset` *object of your game instance.*
+
+```javascript
+// Get the next team
+var nextTeam = myGame.nextTeam;
+
+// Log it
+console.log(nextTeam);
+```
+
+#### Important
+
+Please keep in mind that after a created mill, the next action is normally `remove`. But the next team is* **not** the team that is *removing* (Normally the same team that created the mill before) **but** the contrary team whose piece will be removed.
+
+### Next Action
+
+To get the next action that should be performed within the game, just get the property `nextAction` of your game instance.
+
+```javascript
+// Get the next action
+var nextAction = myGame.nextAction;
+
+// Log it
+console.log(nextAction);
+```
+
+### Phase
+
+The `phase` property of your game instance returns the current phase of the match. (0-2) / (1-3)
+
+```javascript
+// Get the current match's phase
+var phase = myGame.phase;
+
+// Log it
+console.log(phase);
+```
+
+### Game Over
+
+To get wether the game is over, just get the `gameOver` property of your game instance.
+
+```javascript
+// Get wether the game is over
+var isGameOver = myGame.gameOver;
+
+// Log it
+console.log(isGameOver);
+```
+
+### Draw
+
+To get wether the game is a draw, just get the `draw` property of your game instance.
+
+```javascript
+// Get wether the game is a draw
+var isDraw = myGame.draw;
+
+// Log it
+console.log(isDraw);
+```
+
+
 ## Morris Board
 
 The `MorrisBoard` controller is a module that is just used to control the board logic of a Nine Men's Morris board.
@@ -152,9 +299,13 @@ This API provides all needed methods and tools to manage a morris game logically
 If you are using the game controller, a board instance will be created automatically and is accessible at `yourGame.board`.
 But that's how the board works:
 ```javascript
+// 1. Argument is the amount of rows
+// 2. Argument is an array representing the logic of points on a side and wether they are connected vertically
+var board = new MorrisBoard(3, [false, true, false]);
 
+// Test it out
+console.log(board);
 ```
-
 ### Map
 
 The board's points are stored within the `yourBoard.map`. The `map` contains each point as an object literal containing some details about the point and a lot of **Getters** that return things like `mills`, `surroundings`, `line` and more.
@@ -173,6 +324,53 @@ yourBoard.map = [
   }
   ...
 ]
+```
+
+### Coordinating
+
+The coordinating system is, as I already explained, circular. That means, you will mostly address points on the board, by using a row index and a index within the row:
+```javascript
+// Example position object for a point
+{
+  row: [Number], // E.g. 0 for the inner row or 2 for the outer (Common Nine Mens's Morris)
+  position: [Number] // E.g. 0 for the first of your row or 7 for the last one (Common Nine Men's Morris)
+}
+```
+
+*Please keep in mind that you have to use your board instance* **within** *your game instance when working with a game controller. Normally this will be found at* `myGame.board`.
+
+#### Get Point Index (by using its position)
+
+To get the index of a point directly from the position, use the `getPointIndex()` method of your board instance.
+
+```javascript
+var index = board.getPointIndex(row, position);
+```
+(Of course could also get a point's index by using the `indexOf` method with the `map` array of your *board instance* but this needs a *real* point object and is much slower than this method. This method just calculates it directly. That also means that you could a index that does not exist because no point has such a position.)
+
+#### Get Point (by using its position)
+
+To get a point object literal by using the point's position, use the `getPoint()` method of your board instance.
+
+```javascript
+var point = board.getPoint(row, position);
+```
+
+#### Get Point's Position (by using its index)
+
+To get a point's position by using the point's index, use the get `getPointPosition()` method of your board instance.
+
+```javascript
+var pos = board.getPointPosition(index);
+```
+
+#### Get Point (by using its index)
+
+To get a points by its index, just call the index within the `map` array ;-)
+
+```javascript
+// Just simple as it is
+var point = board.map[index];
 ```
 
 
